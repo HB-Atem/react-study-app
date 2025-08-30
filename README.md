@@ -28,6 +28,7 @@
 
 ```
 react-study-app
+├── .github          //GitHub上の処理に関連する設定(GitHub Actionsの設定などがあります)
 ├── .vscode          //vscodeでの作業に関連する設定(biomeの設定などがあります)
 ├── coverage         //単体テスト時にテストカバレッジの情報がこちらに出力される
 ├── public           //faviconなどビルドせずそのままの形式で問題ないファイルを配置
@@ -115,3 +116,25 @@ https://azure.microsoft.com/ja-jp/products/visual-studio-code/
 ```
 
 ※ 実行後にコンソール上、もしくは`coverage/index.html`をブラウザで開くことでテストカバレッジを確認できます
+
+## CICD機能 ※GitHub上のみ対応
+
+GitHub Actionsを利用したCICD（単体テストの自動実行~ビルドファイルの生成/公開）とGitHub Pagesでのアプリ公開に対応しています
+
+デフォルト設定は以下の通りですが、修正の必要がある場合は`.github/workflows`内のymlファイルを適宜修正ください
+
+参考：https://docs.github.com/ja/actions
+
+#### CI
+
+デフォルトではPRの作成時および更新時に、単体テストを自動実行してカバレッジ情報をPRに表示する挙動となっています
+
+#### CD
+
+デフォルトでは`main`ブランチへのpush（PRのマージを含む）時に、ビルドを自動実行してアプリをGitHub Pages上で公開する挙動となっています
+
+#### GitHub Pages上にアプリ公開する際の注意
+
+GitHub Pagesでアプリ公開する際のデフォルトURLに合わせて、Viteで設定するパスも修正する必要があります
+
+`vite.config.ts`の`defineConfig.base`の値をコメントの記載通りに修正してください（カスタムドメインを利用する場合はその限りではありません）
