@@ -1,22 +1,18 @@
 name: CI
-run-name: ${{ github.workflow }} is executed on ${{ github.ref }} cause of ${{ github.actor }}'s change.
-on: [push, pull_request]
+run-name: ${{ github.workflow }} is executed on ${{ github.ref_name }} cause of ${{ github.actor }}'s change.
+on: [pull_request]
 jobs:
   test:
     name: UT
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # PRへのカバレッジ出力権限を付与
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
       - name: Volta Action
         uses: volta-cli/action@v4
-      - name: Version Check
-        run: |
-          node --version
-          yarn --version
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Test
