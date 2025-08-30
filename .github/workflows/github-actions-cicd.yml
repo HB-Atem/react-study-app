@@ -1,0 +1,21 @@
+name: CI
+run-name: ${{ github.workflow }} is executed on ${{ github.ref }} cause of ${{ github.actor }}'s change.
+on: [push, pull_request]
+jobs:
+  test:
+    name: UT
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.10.0
+      - name: Install dependencies
+        run: yarn install
+      - name: Test
+        run: yarn test
+      - name: Report coverage
+        if: always() # テスト失敗時もカバレッジは出力する
+        uses: davelosert/vitest-coverage-report-action@v2
