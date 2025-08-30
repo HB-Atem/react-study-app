@@ -1,6 +1,8 @@
 name: CI
-run-name: ${{ github.workflow }} is executed on ${{ github.ref_name }} cause of ${{ github.actor }}'s change.
-on: [pull_request]
+run-name: ${{ github.workflow }} on PR:${{ github.ref_name }} by ${{ github.actor }}'s change.
+on:
+  pull_request:
+    types: [opened, synchronize]
 jobs:
   test:
     name: UT
@@ -13,10 +15,58 @@ jobs:
         uses: actions/checkout@v4
       - name: Volta Action
         uses: volta-cli/action@v4
-      - name: Install dependencies
+      - name: Install Dependencies
         run: yarn install --frozen-lockfile
       - name: Test
         run: yarn test
-      - name: Report coverage
+      - name: Report Coverage
         if: always() # テスト失敗時もカバレッジは出力する
         uses: davelosert/vitest-coverage-report-action@v2
+
+name: CD
+run-name: ${{ github.workflow }} is executed on ${{ github.ref_name }} cause of ${{ github.actor }}'s change.
+on:
+  push:
+    branches: ['feature/add-github-actions']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: # 連続でフローが動いた時に重複する処理を停止する
+  group: 'pages'
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Volta Action
+        uses: volta-cli/action@v4
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+        env:
+          PUBLIC_URL: /Example_App
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
