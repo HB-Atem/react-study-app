@@ -27,8 +27,6 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build
         run: yarn build
-        env:
-          PUBLIC_URL: /Example_App
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
