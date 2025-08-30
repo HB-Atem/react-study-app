@@ -1,0 +1,24 @@
+name: CI
+run-name: ${{ github.workflow }} on PR:${{ github.ref_name }} by ${{ github.actor }}'s change.
+on: # アクションのトリガータイミングを修正する場合は以下を修正
+  pull_request:
+    types: [opened, synchronize]
+jobs:
+  test:
+    name: UT
+    runs-on: ubuntu-latest
+    permissions: # PRへのカバレッジ出力権限を付与
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+      - name: Volta Action
+        uses: volta-cli/action@v4
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Test
+        run: yarn test
+      - name: Report Coverage
+        if: always() # テスト失敗時もカバレッジは出力する
+        uses: davelosert/vitest-coverage-report-action@v2
